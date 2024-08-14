@@ -7,9 +7,6 @@ const HOST = process.env.SMTP_HOST;
 const PORT = process.env.SMTP_PORT;
 const FROM_EMAIL = process.env.EMAILS_FROM_EMAIL;
 const FROM_NAME = process.env.EMAILS_FROM_NAME;
-const LOCAL_API = process.env.LOCAL_API_URL;
-const API_URL = process.env.API_URL;
-const TOKEN = process.env.TOKEN_BEARER;
 
 export async function GET(req, res) {
   const transporter = nodemailer.createTransport({
@@ -56,3 +53,5 @@ export async function GET(req, res) {
     return new Response("Error generando PDF", { status: 500 });
   }
 }
+
+export const revalidate = 0
