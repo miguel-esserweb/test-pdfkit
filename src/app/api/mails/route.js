@@ -52,9 +52,6 @@ export async function GET() {
       user: USER,
       pass: PASS,
     },
-    tls: {
-      rejectUnauthorized: true,
-    },
   });
 
   try {
@@ -71,6 +68,17 @@ export async function GET() {
     const sendEmail = async (task) => {
       try {
         console.log("Enviando correo a:", task.client);
+        const url = `${API_URL}/operations?shows=30&userId=${task.id}&orderBy=operationDate&&dateAfter=2024-02-06&dateBefore=2024-08-06&sortBy=ascending&report=true`;
+        const response = await axios
+          .get(url, {
+            headers: {
+              Authorization: `Bearer ${TOKEN}`,
+            },
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+        const pdfBuffer = await getPdf(task.client, response.data);
         const email = await transporter.sendMail({
           from: {
             name: FROM_NAME,
@@ -80,6 +88,12 @@ export async function GET() {
           subject: `Reporte para ${task.client}`,
           text: "Reporte de Prueba",
           html: "**Correo enviado por Miguel**",
+          attachments: [
+            {
+              filename: `Reporte ${task.client}.pdf`,
+              content: pdfBuffer,
+            },
+          ],
         });
         console.log("Correo enviado a", task.client, email.messageId);
         return email;
