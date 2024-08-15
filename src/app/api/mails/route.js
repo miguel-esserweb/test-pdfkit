@@ -12,151 +12,97 @@ const LOCAL_API = process.env.LOCAL_API_URL;
 const API_URL = process.env.API_URL;
 const TOKEN = process.env.TOKEN_BEARER;
 
-export async function GET(req, res) {
-  try {
-    class JobQueue {
-      constructor() {
-        this.queue = [];
-        this.isProcessing = false;
-      }
+const createTransporter = () => {
+  return nodemailer.createTransport({
+    host: HOST,
+    port: PORT,
+    secure: false,
+    auth: {
+      user: USER,
+      pass: PASS,
+    },
+  });
+};
+
+const sendEmail = async (task, retries = 3) => {
+  const transporter = createTransporter();
   
-      enqueue(job) {
-        this.queue.push(job);
-        this.processQueue();
-      }
-  
-      async processQueue() {
-        if (this.isProcessing) return;
-  
-        this.isProcessing = true;
-  
-        while (this.queue.length > 0) {
-          const currentJob = this.queue.shift();
-          try {
-            await currentJob();
-          } catch (error) {
-            console.error("Error en el trabajo:", error);
-          }
-        }
-  
-        this.isProcessing = false;
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      console.log(`Enviando correo a: ${task.client} (Intento ${attempt})`);
+      
+      const url = `${API_URL}/operations?shows=30&userId=${task.id}&orderBy=operationDate&dateAfter=2024-02-06&dateBefore=2024-08-06&sortBy=ascending&report=true`;
+      const { data } = await axios.get(url, {
+        headers: { Authorization: `Bearer ${TOKEN}` },
+      });
+      
+      const pdfBuffer = await getPdf(task.client, data);
+      
+      await transporter.sendMail({
+        from: { name: FROM_NAME, address: FROM_EMAIL },
+        to: [task.mail],
+        subject: `Reporte para ${task.client}`,
+        text: "Reporte del mes",
+        html: "<b>Este es el reporte mensual</b>",
+        attachments: [{
+          filename: `Reporte ${task.client}.pdf`,
+          content: pdfBuffer,
+        }],
+      });
+      
+      console.log(`Correo enviado exitosamente a ${task.client}`);
+      return;
+    } catch (error) {
+      console.error(`Error al enviar correo a ${task.client}:`, error.message);
+      if (attempt === retries) {
+        console.log(`Falló el envío del correo a ${task.client} después de ${retries} intentos`);
       }
     }
-  
-    const transporter = nodemailer.createTransport({
-      host: HOST,
-      port: PORT,
-      starttls: {
-        enable: true,
-      },
-      secure: false,
-      auth: {
-        user: USER,
-        pass: PASS,
-      },
-    });
-  
-    const sendEmail = async (task, retries = 1, attempt = 0) => {
+  }
+};
+
+class JobQueue {
+  constructor() {
+    this.queue = [];
+    this.isProcessing = false;
+  }
+
+  enqueue(job) {
+    this.queue.push(job);
+    this.processQueue();
+  }
+
+  async processQueue() {
+    if (this.isProcessing) return;
+    this.isProcessing = true;
+
+    while (this.queue.length > 0) {
+      const currentJob = this.queue.shift();
       try {
-        if (attempt !== 0) {
-          console.log("Enviando correo a:", task.client, `(Intento ${attempt})`);
-        } else {
-          console.log("Enviando correo a:", task.client);
-        }
-        const url = `${API_URL}/operations?shows=30&userId=${task.id}&orderBy=operationDate&&dateAfter=2024-02-06&dateBefore=2024-08-06&sortBy=ascending&report=true`;
-        const response = await axios
-          .get(url, {
-            headers: {
-              Authorization: `Bearer ${TOKEN}`,
-            },
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-        const pdfBuffer = await getPdf(task.client, response.data);
-        await transporter.sendMail({
-          from: {
-            name: FROM_NAME,
-            address: FROM_EMAIL,
-          },
-          to: [task.mail],
-          subject: `Reporte para ${task.client}`,
-          text: "Reporte del mes",
-          html: "<b>Este es el b</b>",
-          attachments: [
-            {
-              filename: `Reporte ${task.client}.pdf`,
-              content: pdfBuffer,
-            },
-          ],
-        });
-        console.log("Se envio el correo a", task.client, pdfBuffer);
+        await currentJob();
       } catch (error) {
-        console.error(error.message);
-        if (retries > 0) {
-          attempt++;
-          console.log(`Reintentando enviar el correo a ${task.client}...`);
-          await sendEmail(
-            {
-              id: task.id,
-              client: task.client,
-              mail: task.mail,
-            },
-            retries - 1,
-            attempt
-          );
-        } else {
-          console.log(`Fallo el envio del correo a ${task.client}...`);
-        }
+        console.error("Error en el trabajo:", error);
       }
-    };
-  
-    const jobQueue = new JobQueue();
-  
-    //   await axios
-    //     .get(`${LOCAL_API}/send`)
-    //     .then((res) => {
-    //       console.log(res.data);
-    //       res.data.forEach((email) => {
-    //         jobQueue.enqueue(() =>
-    //           sendEmail(
-    //             {
-    //               id: email.id,
-    //               client: email.cliente,
-    //               mail: email.correo,
-    //             },
-    //             3
-    //           )
-    //         );
-    //       });
-    //     })
-  
-    axios.get(`${LOCAL_API}/send`).then((res) =>
-      res.data.forEach((element) => {
-        jobQueue.enqueue(() =>
-          sendEmail(
-          {
-              id: element.id,
-              client: element.cliente,
-              mail: element.correo,
-          },
-          3
-          )
-      );
-      })
-    );
-    return new Response("Se envio el correo", {
-      status: 200,
-      // headers: {
-      //   "Content-Type": "application/pdf",
-      //   "Content-Disposition": 'inline; filename="output.pdf"',
-      //   "Content-Length": pdfBuffer.length,
-      // },
-    });
-  } catch (error) {
-    console.error("Error generando PDF:", error);
-    return new Response("Error generando PDF", { status: 500 });
+    }
+
+    this.isProcessing = false;
   }
 }
 
-export const revalidate = 0
+export async function GET(req, res) {
+  const jobQueue = new JobQueue();
+
+  try {
+    const { data } = await axios.get(`${LOCAL_API}/send`);
+    data.forEach(({ id, cliente: client, correo: mail }) => {
+      jobQueue.enqueue(() => sendEmail({ id, client, mail }));
+    });
+
+    return new Response("Proceso de envío de correos iniciado", { status: 200 });
+  } catch (error) {
+    console.error("Error al iniciar el proceso de envío:", error);
+    return new Response("Error al iniciar el proceso de envío", { status: 500 });
+  }
+}
+
+export const revalidate = 0;
