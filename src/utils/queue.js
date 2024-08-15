@@ -113,222 +113,235 @@ export function queue() {
 
   const jobQueue = new JobQueue();
 
-//   await axios
-//     .get(`${LOCAL_API}/send`)
-//     .then((res) => {
-//       console.log(res.data);
-//       res.data.forEach((email) => {
-//         jobQueue.enqueue(() =>
-//           sendEmail(
-//             {
-//               id: email.id,
-//               client: email.cliente,
-//               mail: email.correo,
-//             },
-//             3
-//           )
-//         );
-//       });
-//     })
-//     .catch((err) => console.log(err));
-    jobQueue.enqueue(() =>
-        sendEmail(
+  //   await axios
+  //     .get(`${LOCAL_API}/send`)
+  //     .then((res) => {
+  //       console.log(res.data);
+  //       res.data.forEach((email) => {
+  //         jobQueue.enqueue(() =>
+  //           sendEmail(
+  //             {
+  //               id: email.id,
+  //               client: email.cliente,
+  //               mail: email.correo,
+  //             },
+  //             3
+  //           )
+  //         );
+  //       });
+  //     })
+
+  axios.get(`${LOCAL_API}/send`).then((res) =>
+    res.data.forEach((element) => {
+      sendEmail(
         {
-            id: "246",
-            client: "Miguel",
-            mail: "miguel.esserweb@gmail.com",
+          id: element.id,
+          client: element.cliente,
+          mail: element.correo,
         },
         3
-        )
-    );
-    jobQueue.enqueue(() =>
-        sendEmail(
-        {
-            id: "246",
-            client: "Daniel",
-            mail: "daniel.esserweb@gmail.com",
-        },
-        3
-        )
-    );
-    jobQueue.enqueue(() =>
-        sendEmail(
-        {
-            id: "246",
-            client: "Miguel",
-            mail: "miguel.esserweb@gmail.com",
-        },
-        3
-        )
-    );
-    jobQueue.enqueue(() =>
-        sendEmail(
-        {
-            id: "246",
-            client: "Daniel",
-            mail: "daniel.esserweb@gmail.com",
-        },
-        3
-        )
-    );
-    jobQueue.enqueue(() =>
-        sendEmail(
-        {
-            id: "246",
-            client: "Miguel",
-            mail: "miguel.esserweb@gmail.com",
-        },
-        3
-        )
-    );
-    jobQueue.enqueue(() =>
-        sendEmail(
-        {
-            id: "246",
-            client: "Daniel",
-            mail: "daniel.esserweb@gmail.com",
-        },
-        3
-        )
-    );
-    jobQueue.enqueue(() =>
-        sendEmail(
-        {
-            id: "246",
-            client: "Miguel",
-            mail: "miguel.esserweb@gmail.com",
-        },
-        3
-        )
-    );
-    jobQueue.enqueue(() =>
-        sendEmail(
-        {
-            id: "246",
-            client: "Daniel",
-            mail: "daniel.esserweb@gmail.com",
-        },
-        3
-        )
-    );
-    jobQueue.enqueue(() =>
-        sendEmail(
-        {
-            id: "246",
-            client: "Miguel",
-            mail: "miguel.esserweb@gmail.com",
-        },
-        3
-        )
-    );
-    jobQueue.enqueue(() =>
-        sendEmail(
-        {
-            id: "246",
-            client: "Daniel",
-            mail: "daniel.esserweb@gmail.com",
-        },
-        3
-        )
-    );
-    jobQueue.enqueue(() =>
-        sendEmail(
-        {
-            id: "246",
-            client: "Miguel",
-            mail: "miguel.esserweb@gmail.com",
-        },
-        3
-        )
-    );
-    jobQueue.enqueue(() =>
-        sendEmail(
-        {
-            id: "246",
-            client: "Daniel",
-            mail: "daniel.esserweb@gmail.com",
-        },
-        3
-        )
-    );
-    jobQueue.enqueue(() =>
-        sendEmail(
-        {
-            id: "246",
-            client: "Miguel",
-            mail: "miguel.esserweb@gmail.com",
-        },
-        3
-        )
-    );
-    jobQueue.enqueue(() =>
-        sendEmail(
-        {
-            id: "246",
-            client: "Daniel",
-            mail: "daniel.esserweb@gmail.com",
-        },
-        3
-        )
-    );
-    jobQueue.enqueue(() =>
-        sendEmail(
-        {
-            id: "246",
-            client: "Miguel",
-            mail: "miguel.esserweb@gmail.com",
-        },
-        3
-        )
-    );
-    jobQueue.enqueue(() =>
-        sendEmail(
-        {
-            id: "246",
-            client: "Daniel",
-            mail: "daniel.esserweb@gmail.com",
-        },
-        3
-        )
-    );
-    jobQueue.enqueue(() =>
-        sendEmail(
-        {
-            id: "246",
-            client: "Miguel",
-            mail: "miguel.esserweb@gmail.com",
-        },
-        3
-        )
-    );
-    jobQueue.enqueue(() =>
-        sendEmail(
-        {
-            id: "246",
-            client: "Daniel",
-            mail: "daniel.esserweb@gmail.com",
-        },
-        3
-        )
-    );
-    jobQueue.enqueue(() =>
-        sendEmail(
-        {
-            id: "246",
-            client: "Miguel",
-            mail: "miguel.esserweb@gmail.com",
-        },
-        3
-        )
-    );
-    jobQueue.enqueue(() =>
-        sendEmail(
-        {
-            id: "246",
-            client: "Daniel",
-            mail: "daniel.esserweb@gmail.com",
-        },
-        3
-        )
-    );
+      );
+    })
+  );
+  //     .catch((err) => console.log(err));
+  // jobQueue.enqueue(() =>
+  //     sendEmail(
+  //     {
+  //         id: "246",
+  //         client: "Miguel",
+  //         mail: "miguel.esserweb@gmail.com",
+  //     },
+  //     3
+  //     )
+  // );
+  // jobQueue.enqueue(() =>
+  //     sendEmail(
+  //     {
+  //         id: "246",
+  //         client: "Daniel",
+  //         mail: "daniel.esserweb@gmail.com",
+  //     },
+  //     3
+  //     )
+  // );
+  // jobQueue.enqueue(() =>
+  //     sendEmail(
+  //     {
+  //         id: "246",
+  //         client: "Miguel",
+  //         mail: "miguel.esserweb@gmail.com",
+  //     },
+  //     3
+  //     )
+  // );
+  // jobQueue.enqueue(() =>
+  //     sendEmail(
+  //     {
+  //         id: "246",
+  //         client: "Daniel",
+  //         mail: "daniel.esserweb@gmail.com",
+  //     },
+  //     3
+  //     )
+  // );
+  // jobQueue.enqueue(() =>
+  //     sendEmail(
+  //     {
+  //         id: "246",
+  //         client: "Miguel",
+  //         mail: "miguel.esserweb@gmail.com",
+  //     },
+  //     3
+  //     )
+  // );
+  // jobQueue.enqueue(() =>
+  //     sendEmail(
+  //     {
+  //         id: "246",
+  //         client: "Daniel",
+  //         mail: "daniel.esserweb@gmail.com",
+  //     },
+  //     3
+  //     )
+  // );
+  // jobQueue.enqueue(() =>
+  //     sendEmail(
+  //     {
+  //         id: "246",
+  //         client: "Miguel",
+  //         mail: "miguel.esserweb@gmail.com",
+  //     },
+  //     3
+  //     )
+  // );
+  // jobQueue.enqueue(() =>
+  //     sendEmail(
+  //     {
+  //         id: "246",
+  //         client: "Daniel",
+  //         mail: "daniel.esserweb@gmail.com",
+  //     },
+  //     3
+  //     )
+  // );
+  // jobQueue.enqueue(() =>
+  //     sendEmail(
+  //     {
+  //         id: "246",
+  //         client: "Miguel",
+  //         mail: "miguel.esserweb@gmail.com",
+  //     },
+  //     3
+  //     )
+  // );
+  // jobQueue.enqueue(() =>
+  //     sendEmail(
+  //     {
+  //         id: "246",
+  //         client: "Daniel",
+  //         mail: "daniel.esserweb@gmail.com",
+  //     },
+  //     3
+  //     )
+  // );
+  // jobQueue.enqueue(() =>
+  //     sendEmail(
+  //     {
+  //         id: "246",
+  //         client: "Miguel",
+  //         mail: "miguel.esserweb@gmail.com",
+  //     },
+  //     3
+  //     )
+  // );
+  // jobQueue.enqueue(() =>
+  //     sendEmail(
+  //     {
+  //         id: "246",
+  //         client: "Daniel",
+  //         mail: "daniel.esserweb@gmail.com",
+  //     },
+  //     3
+  //     )
+  // );
+  // jobQueue.enqueue(() =>
+  //     sendEmail(
+  //     {
+  //         id: "246",
+  //         client: "Miguel",
+  //         mail: "miguel.esserweb@gmail.com",
+  //     },
+  //     3
+  //     )
+  // );
+  // jobQueue.enqueue(() =>
+  //     sendEmail(
+  //     {
+  //         id: "246",
+  //         client: "Daniel",
+  //         mail: "daniel.esserweb@gmail.com",
+  //     },
+  //     3
+  //     )
+  // );
+  // jobQueue.enqueue(() =>
+  //     sendEmail(
+  //     {
+  //         id: "246",
+  //         client: "Miguel",
+  //         mail: "miguel.esserweb@gmail.com",
+  //     },
+  //     3
+  //     )
+  // );
+  // jobQueue.enqueue(() =>
+  //     sendEmail(
+  //     {
+  //         id: "246",
+  //         client: "Daniel",
+  //         mail: "daniel.esserweb@gmail.com",
+  //     },
+  //     3
+  //     )
+  // );
+  // jobQueue.enqueue(() =>
+  //     sendEmail(
+  //     {
+  //         id: "246",
+  //         client: "Miguel",
+  //         mail: "miguel.esserweb@gmail.com",
+  //     },
+  //     3
+  //     )
+  // );
+  // jobQueue.enqueue(() =>
+  //     sendEmail(
+  //     {
+  //         id: "246",
+  //         client: "Daniel",
+  //         mail: "daniel.esserweb@gmail.com",
+  //     },
+  //     3
+  //     )
+  // );
+  // jobQueue.enqueue(() =>
+  //     sendEmail(
+  //     {
+  //         id: "246",
+  //         client: "Miguel",
+  //         mail: "miguel.esserweb@gmail.com",
+  //     },
+  //     3
+  //     )
+  // );
+  // jobQueue.enqueue(() =>
+  //     sendEmail(
+  //     {
+  //         id: "246",
+  //         client: "Daniel",
+  //         mail: "daniel.esserweb@gmail.com",
+  //     },
+  //     3
+  //     )
+  // );
 }

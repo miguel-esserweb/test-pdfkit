@@ -35,7 +35,7 @@ export function getPdf(name){
           .fontSize(15)
           .fillColor("#000")
           .moveDown()
-          .text(name, 50, 250)
+          .text(name, 50, 220)
     
         doc
           .moveDown(1.5)
