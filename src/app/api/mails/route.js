@@ -91,7 +91,7 @@ class JobQueue {
 
 export async function GET(req, res) {
   try {
-    const { data } = await axios.get(`${LOCAL_API_URL}/send`);
+    const { data } = await axios.get(`${LOCAL_API}/send`);
     
     if (data.length > 0) {
       await sendEmail({
