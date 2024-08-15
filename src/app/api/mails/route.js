@@ -41,8 +41,6 @@ class JobQueue {
 }
 
 export async function GET() {
-  const jobQueue = new JobQueue();
-  
   const transporter = nodemailer.createTransport({
     host: HOST,
     port: PORT,
@@ -92,15 +90,24 @@ export async function GET() {
     };
 
     if (emails && Array.isArray(emails)) {
-      const emailPromises = emails.map((email) =>
-        jobQueue.enqueue(() =>
-          sendEmail({
-            id: email.id,
-            client: email.cliente,
-            mail: email.correo,
-          })
-        )
-      );
+      const jobQueue = new JobQueue();
+
+      const emailPromises = emails.map((email) => {
+        return new Promise((resolve, reject) => {
+          jobQueue.enqueue(async () => {
+            try {
+              const result = await sendEmail({
+                id: email.id,
+                client: email.cliente,
+                mail: email.correo,
+              });
+              resolve(result);
+            } catch (error) {
+              reject(error);
+            }
+          });
+        });
+      });
 
       const responses = await Promise.all(emailPromises);
 
@@ -108,8 +115,6 @@ export async function GET() {
         status: 200,
         headers: { "Content-Type": "application/json" },
       });
-    } else {
-      throw new Error("No se recibieron correos válidos");
     }
   } catch (err) {
     console.error("Error en el proceso de envío de correos:", err);
@@ -118,6 +123,5 @@ export async function GET() {
     });
   }
 }
-
 
 export const revalidate = 0;
