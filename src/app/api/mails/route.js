@@ -111,7 +111,7 @@ export async function GET(req, res) {
         
         setTimeout(() => {
           sendEmail(task).catch(console.error);
-        }, i * 1000);
+        }, i * 500);
       }
     }
 
@@ -122,4 +122,5 @@ export async function GET(req, res) {
   }
 }
 
+export const maxDuration = 60;
 export const revalidate = 0;
