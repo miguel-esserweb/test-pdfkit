@@ -90,15 +90,32 @@ class JobQueue {
 }
 
 export async function GET(req, res) {
-  const jobQueue = new JobQueue();
-
   try {
-    const { data } = await axios.get(`${LOCAL_API}/send`);
-    data.forEach(({ id, cliente: client, correo: mail }) => {
-      jobQueue.enqueue(() => sendEmail({ id, client, mail }));
-    });
+    const { data } = await axios.get(`${LOCAL_API_URL}/send`);
+    
+    if (data.length > 0) {
+      await sendEmail({
+        id: data[0].id,
+        client: data[0].cliente,
+        mail: data[0].correo
+      });
+    }
 
-    return new Response("Proceso de envío de correos iniciado", { status: 200 });
+    if (data.length > 1) {
+      for (let i = 1; i < data.length; i++) {
+        const task = {
+          id: data[i].id,
+          client: data[i].cliente,
+          mail: data[i].correo
+        };
+        
+        setTimeout(() => {
+          sendEmail(task).catch(console.error);
+        }, i * 1000);
+      }
+    }
+
+    return new Response(`Proceso de envío de correos iniciado. Se procesarán ${data.length} correos.`, { status: 200 });
   } catch (error) {
     console.error("Error al iniciar el proceso de envío:", error);
     return new Response("Error al iniciar el proceso de envío", { status: 500 });
