@@ -12,7 +12,7 @@ const LOCAL_API = process.env.LOCAL_API_URL;
 const API_URL = process.env.API_URL;
 const TOKEN = process.env.TOKEN_BEARER;
 
-export function queue() {
+export async function queue() {
   console.log("Se ejecuto QueueEmails");
   class JobQueue {
     constructor() {

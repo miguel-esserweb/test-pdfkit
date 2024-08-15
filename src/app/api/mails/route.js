@@ -1,52 +1,15 @@
-import { getPdf } from "@/utils/getPdf";
-const nodemailer = require("nodemailer");
-
-const USER = process.env.SMTP_USER;
-const PASS = process.env.SMTP_PASSWORD;
-const HOST = process.env.SMTP_HOST;
-const PORT = process.env.SMTP_PORT;
-const FROM_EMAIL = process.env.EMAILS_FROM_EMAIL;
-const FROM_NAME = process.env.EMAILS_FROM_NAME;
+import { queue } from "@/utils/queue";
 
 export async function GET(req, res) {
-  const transporter = nodemailer.createTransport({
-    host: HOST,
-    port: PORT,
-    starttls: {
-      enable: true,
-    },
-    secure: false,
-    auth: {
-      user: USER,
-      pass: PASS,
-    },
-  });
   try {
-    const pdfBuffer = await getPdf();
-
-    await transporter.sendMail({
-      from: {
-        name: FROM_NAME,
-        address: FROM_EMAIL,
-      },
-      to: ["miguel.esserweb@gmail.com", "daniel.esserweb@gmail.com"],
-      subject: `Reporte para`,
-      text: "Reporte del mes",
-      html: "<b>Este es el b</b>",
-      attachments: [
-        {
-          filename: `Reporte.pdf`,
-          content: pdfBuffer,
-        },
-      ],
-    });
-    return new Response(pdfBuffer, {
+    await queue()
+    return new Response("Se envio el correo", {
       status: 200,
-      headers: {
-        "Content-Type": "application/pdf",
-        "Content-Disposition": 'inline; filename="output.pdf"',
-        "Content-Length": pdfBuffer.length,
-      },
+      // headers: {
+      //   "Content-Type": "application/pdf",
+      //   "Content-Disposition": 'inline; filename="output.pdf"',
+      //   "Content-Length": pdfBuffer.length,
+      // },
     });
   } catch (error) {
     console.error("Error generando PDF:", error);
