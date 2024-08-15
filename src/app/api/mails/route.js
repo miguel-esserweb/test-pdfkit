@@ -81,7 +81,7 @@ export async function GET() {
           to: [task.mail],
           subject: `Reporte para ${task.client}`,
           text: "Reporte del mes",
-          html: "**Correo enviado por daniel**",
+          html: "**Correo enviado por Miguel**",
         });
         console.log("Correo enviado a", task.client, email.messageId);
         return email;
